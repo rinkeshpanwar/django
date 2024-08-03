@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: django
+      MYSQL_USER: rinkesh
+      MYSQL_PASSWORD: rinkesh
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  web:
+    image: python:3.10
+    restart: always
+    volumes:
+      - ./backend:/code
+    working_dir: /code
+    command: >
+      sh -c "
+      pip install -r requirement.txt &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_NAME=django
+      - DB_USER=rinkesh
+      - DB_PASS=rinkesh
+
+volumes:
+  db_data:
